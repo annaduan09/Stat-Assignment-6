@@ -79,6 +79,7 @@ get_yelp = function(category, zip_code, offset_num) { # args are category of bus
   yelp.json = content(response, "parsed", flatten = TRUE, simplify = TRUE)
   
   # retrieve columns from json structure
+  biz.id = data.frame(yelp.json$businesses$id)
   biz.name = data.frame(yelp.json$businesses$name)
   biz.lat = data.frame(yelp.json$businesses$coordinates.latitude)
   biz.lon = data.frame(yelp.json$businesses$coordinates.longitude)
@@ -86,10 +87,10 @@ get_yelp = function(category, zip_code, offset_num) { # args are category of bus
   biz.addr = data.frame(yelp.json$businesses$location.address1)
   
   # bind the columns into one dataframe
-  yelp.df = cbind(biz.name, biz.rating, biz.addr, biz.lat, biz.lon)  %>%
+  yelp.df = cbind(biz.id, biz.name, biz.rating, biz.addr, biz.lat, biz.lon)  %>%
     as.data.frame()
   
-  colnames(yelp.df) <- c("name", "rating", "address", "lat", "lon")
+  colnames(yelp.df) <- c("id", "name", "rating", "address", "lat", "lon")
   
   # add in category alias/title (this will give us cuisine information)
   cuisine = yelp.json$businesses$categories
@@ -136,18 +137,10 @@ biz_list_4 <- initialize_named_dfs(zip_list)
 biz_list_5 <- initialize_named_dfs(zip_list)
 biz_list_6 <- initialize_named_dfs(zip_list)
 
-biz_list_7 <- initialize_named_dfs(zip_list)
-biz_list_8 <- initialize_named_dfs(zip_list)
-
-biz_list_9 <- initialize_named_dfs(zip_list)
-biz_list_10 <- initialize_named_dfs(zip_list)
-
-
 
 # master list to store the dataframes
 offset_list <- list(biz_list_0, biz_list_1, biz_list_2, biz_list_3,
-                    biz_list_4, biz_list_5, biz_list_6, biz_list_7,
-                    biz_list_8, biz_list_9, biz_list_10 )
+                    biz_list_4, biz_list_5, biz_list_6)
 
 # Loop through each offset (think of each offset as a page of results)
 for (i in 1:length(zip_list)) {
@@ -162,7 +155,7 @@ for (i in 1:length(zip_list)) {
     print(paste("batch ", offset + 1, ", ", "zip", zipnum, ": ", zip_code, sep = ""))
     
     # Fetch Yelp data for the zip code and store it in the list
-    offset_list[[i]][[as.character(zip_code)]] <- get_yelp("sports", as.character(zip_code), offset)
+    offset_list[[i]][[as.character(zip_code)]] <- get_yelp("parks", as.character(zip_code), offset)
     
     zipnum <- zipnum + 1 #iterate zipnum each loop
   }
@@ -180,7 +173,74 @@ biz.sf <- map_dfr(offset_list, ~ bind_rows(.x)) %>%
   st_as_sf(crs = 4326, coords = c("lon", "lat")) %>% 
   st_transform("EPSG:2272")
 
+park_id <- biz.sf$id
 ```
+
+```{r parks}
+
+url <- "https://api.yelp.com/v3/businesses/LklDTDwgJLbUjd67ZKsvCg/reviews"
+
+queryString <- list(
+  limit = "50",
+  sort_by = "newest"
+)
+
+response <- VERB("GET", url, query = queryString, add_headers('Authorization' = 'Bearer RF7JfYA8GMJRVlASJCtsrJvLMhE8nbKDjkQ8B_7ZYUPWforzJV1mNDb6ibRWJfMUu_RHFG-NxCF1QHeasyOxlpid7ZbQ1tQBcACDZBWE2rLYKDhWD8Kxps0SZJJCZXYx'), content_type("application/octet-stream"), accept("application/json"))
+
+# turn the response into a json file
+  yelp.json = content(response, "parsed", flatten = TRUE, simplify = TRUE)
+  
+  # retrieve columns from json structure
+  review.time = data.frame(yelp.json$reviews$time_created)
+  review.rating = data.frame(yelp.json$reviews$rating)
+  review.text = data.frame(yelp.json$reviews$text)
+  
+  # bind the columns into one dataframe
+  yelp.df = cbind(review.time, review.rating, review.text)  %>%
+    as.data.frame()
+  
+  colnames(yelp.df) <- c("time", "rating", "text")
+  
+```
+
+```{r parks function}
+get_yelp_reviews <- function(business_id, auth_token) {
+  url <- paste0("https://api.yelp.com/v3/businesses/", business_id, "/reviews")
+
+  queryString <- list(
+    limit = "50",
+    sort_by = "newest"
+  )
+
+  response <- httr::VERB("GET", url, query = queryString, add_headers('Authorization' = paste0('Bearer ', auth_token)), content_type("application/octet-stream"), accept("application/json"))
+
+  # turn the response into a json file
+  yelp.json <- httr::content(response, "parsed", flatten = TRUE, simplify = TRUE)
+
+  # retrieve columns from json structure
+  review.time <- data.frame(yelp.json$reviews$time_created)
+  review.rating <- data.frame(yelp.json$reviews$rating)
+  review.text <- data.frame(yelp.json$reviews$text)
+
+  # bind the columns into one dataframe
+  yelp.df <- dplyr::bind_cols(review.time, review.rating, review.text) %>%
+    dplyr::as_tibble()
+
+  # Add a column for the business ID
+  yelp.df$business_id <- business_id
+
+  return(yelp.df)
+}
+
+# Example usage
+auth_token <- "RF7JfYA8GMJRVlASJCtsrJvLMhE8nbKDjkQ8B_7ZYUPWforzJV1mNDb6ibRWJfMUu_RHFG-NxCF1QHeasyOxlpid7ZbQ1tQBcACDZBWE2rLYKDhWD8Kxps0SZJJCZXYx"
+all_reviews <- do.call(rbind, lapply(park_id, function(id) get_yelp_reviews(id, auth_token)))
+
+
+reviews.sf <- all_reviews %>%
+  left_join(biz.sf, by= c("business_id" = "id"))
+```
+
 
 
 ## Write geojson file
