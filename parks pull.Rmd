@@ -236,16 +236,14 @@ get_yelp_reviews <- function(business_id, auth_token) {
 auth_token <- "RF7JfYA8GMJRVlASJCtsrJvLMhE8nbKDjkQ8B_7ZYUPWforzJV1mNDb6ibRWJfMUu_RHFG-NxCF1QHeasyOxlpid7ZbQ1tQBcACDZBWE2rLYKDhWD8Kxps0SZJJCZXYx"
 all_reviews <- do.call(rbind, lapply(park_id, function(id) get_yelp_reviews(id, auth_token)))
 
-
 reviews.sf <- all_reviews %>%
   left_join(biz.sf, by= c("business_id" = "id"))
 ```
 
 
-
 ## Write geojson file
 ```{r write files}
-st_write(biz.sf, "entertainment.geojson", driver = "geojson")
+st_write(reviews.sf, "park_reviews.geojson", driver = "geojson")
 ```
 ## Write boundary files
 ```{r write boundary files}
