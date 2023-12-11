@@ -1,0 +1,48 @@
+---
+title: "Homework6"
+author: "Trevor Kapuvari"
+date: "2023-12-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE}
+
+
+options(scipen=999)
+
+library(wordcloud)
+library(text)
+library(tm)
+library(SnowballC)
+library(words)
+library(NbClust)
+library(stringr)
+library(dplyr)
+library(syuzhet)
+library(devtools)
+library(tm)
+library(docxtractr)
+library(stringr)
+library(qdapTools)
+#library(gptchatteR)
+library(data.table)
+library(chatgpt)
+library(httr)
+library(textstem)
+library(tigris)
+library(tidyverse)
+library(sf)
+library(mapview)
+library(httr)
+library(viridis)
+devtools::install_github("kstagaman/autoNumCaptions")
+
+
+```
+
+
