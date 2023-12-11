@@ -1,0 +1,97 @@
+---
+title: "Homework6"
+author: "Trevor Kapuvari"
+date: "2023-12-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r setup, include=FALSE}
+
+
+options(scipen=999)
+
+library(wordcloud)
+library(text)
+library(tm)
+library(SnowballC)
+library(words)
+library(NbClust)
+library(stringr)
+library(dplyr)
+library(syuzhet)
+library(devtools)
+library(tm)
+library(docxtractr)
+library(stringr)
+library(qdapTools)
+#library(gptchatteR)
+library(data.table)
+library(chatgpt)
+library(httr)
+library(textstem)
+devtools::install_github("kstagaman/autoNumCaptions")
+
+
+```
+
+```{r urls}
+
+urls <- c(
+  "https://www.gutenberg.org/cache/epub/2600/pg2600.txt",
+  "https://www.gutenberg.org/files/2554/2554-0.txt",
+  "https://www.gutenberg.org/cache/epub/42671/pg42671.txt",
+  "https://www.gutenberg.org/files/98/98-0.txt",
+  "https://www.gutenberg.org/cache/epub/158/pg158.txt",
+  "https://www.gutenberg.org/cache/epub/28054/pg28054.txt",
+  "https://www.gutenberg.org/cache/epub/1260/pg1260.txt",
+  "https://www.gutenberg.org/cache/epub/64317/pg64317.txt",
+  "https://www.gutenberg.org/cache/epub/768/pg768.txt",
+  "https://www.gutenberg.org/files/2701/2701-0.txt",
+  "https://www.gutenberg.org/cache/epub/215/pg215.txt",
+  "https://www.gutenberg.org/cache/epub/84/pg84.txt",
+  "https://www.gutenberg.org/cache/epub/514/pg514.txt",
+  "https://www.gutenberg.org/cache/epub/599/pg599.txt",
+  "https://www.gutenberg.org/cache/epub/1399/pg1399.txt",
+  "https://www.gutenberg.org/cache/epub/1184/pg1184.txt",
+  "https://www.gutenberg.org/files/1400/1400-0.txt",
+  "https://www.gutenberg.org/files/135/135-0.txt",
+  "https://www.gutenberg.org/cache/epub/345/pg345.txt",
+  "https://www.gutenberg.org/files/2413/2413-0.txt",
+  "https://www.gutenberg.org/cache/epub/996/pg996.txt",
+  "https://www.gutenberg.org/files/65473/65473-0.txt",
+  "https://www.gutenberg.org/cache/epub/76/pg76.txt",
+  "https://www.gutenberg.org/cache/epub/4078/pg4078.txt",
+  "https://www.gutenberg.org/cache/epub/910/pg910.txt",
+  "https://www.gutenberg.org/files/24022/24022-0.txt",
+  "https://www.gutenberg.org/files/2638/2638-0.txt",
+  "https://www.gutenberg.org/files/35/35-0.txt",
+  "https://www.gutenberg.org/cache/epub/541/pg541.txt",
+  "https://www.gutenberg.org/cache/epub/351/pg351.txt",
+  "https://www.gutenberg.org/cache/epub/26/pg26.txt",
+  "https://www.gutenberg.org/cache/epub/70841/pg70841.txt",
+  "https://www.gutenberg.org/cache/epub/19942/pg19942.txt",
+  "https://www.gutenberg.org/files/940/940-0.txt",
+  "https://www.gutenberg.org/files/1081/1081-0.txt",
+  "https://www.gutenberg.org/cache/epub/25344/pg25344.txt",
+  "https://www.gutenberg.org/cache/epub/27780/pg27780.txt",
+  "https://www.gutenberg.org/files/4300/4300-0.txt",
+  "https://www.gutenberg.org/cache/epub/7849/pg7849.txt",
+  "https://www.gutenberg.org/cache/epub/1257/pg1257.txt",
+  "https://www.gutenberg.org/files/5200/5200-0.txt",
+  "https://www.gutenberg.org/cache/epub/63203/pg63203.txt",
+  "https://www.gutenberg.org/cache/epub/1232/pg1232.txt",
+  "https://www.gutenberg.org/files/3207/3207-0.txt",
+  "https://www.gutenberg.org/cache/epub/766/pg766.txt",
+  "https://www.gutenberg.org/cache/epub/2610/pg2610.txt",
+  "https://www.gutenberg.org/files/2130/2130-0.txt"
+)
+
+
+
+
+```
