@@ -47,16 +47,19 @@ devtools::install_github("kstagaman/autoNumCaptions")
 
 ```{r URL}
 
-url <- c("https://github.com/annaduan09/Stat-Assignment-6/raw/master/park_reviews.geojson")
+url <- read_sf("https://github.com/annaduan09/Stat-Assignment-6/raw/master/park_reviews.geojson")
 urltext = url$yelp.json.reviews.text
-  
+write.table(urltext, file = "yelptext.txt")
+
+yelptext = c("https://github.com/annaduan09/Stat-Assignment-6/raw/master/yelptext.txt")
+
 ```
 
 
 ```{r Corpus}
 
 
-myCorpus <- tm::VCorpus(VectorSource(sapply(url, readLines)))
+myCorpus <- tm::VCorpus(VectorSource(sapply(yelptext, readLines)))
 
 myCorpus <- tm_map(myCorpus, content_transformer(tolower))
 
@@ -83,16 +86,85 @@ myCorpus <- tm_map(myCorpus, toSpace, "‘")
 myCorpus <- tm_map(myCorpus, remApostrophe, "’")
 stopwords("english")
 myCorpus <- tm_map(myCorpus, removeWords, stopwords("english"))
+myCorpus <- tm_map(myCorpus, stemDocument)
+tdm <- TermDocumentMatrix(myCorpus)
+
 
 ```
 
 
 ```{r view}
+myCorpus <- tm::tm_map(myCorpus, removeNumbers)
+myCorpus <- tm_map(myCorpus, removePunctuation)
+
+tdm <- TermDocumentMatrix(myCorpus)
+tm::inspect(tdm)
+
+m<- as.matrix(tdm)
+dim(m)
+
+```
+
+```{r view}
+rownames(m) <- tdm$dimnames$Terms
+
+```
 
 
 
+```{r view}
+
+dictionary <- as.character(words::words$word)
+row_names <- rownames(m)
+in_dictionary <- row_names %in% dictionary
+remove <- as.character(row_names[!in_dictionary])
+
+#Since the data are so large, if we try to remove all words at once, we get an error. So we will remove them in chunks of 1000.
+
+num_observations <- as.numeric(length(remove))  # Total number of observations
+chunk_size <- 1000                              # Number of observations to display at a time
+
+for (i in seq(1, num_observations, chunk_size)) {
+  start <- i
+  end <- i + chunk_size - 1
+  end <- ifelse(end > num_observations, num_observations, end)
+  myCorpus <- tm_map(myCorpus, removeWords, remove[start:end])  
+}
+
+```
+
+```{r Document Term Matrix}
+dtm_cleaned <- DocumentTermMatrix(myCorpus)
+tm::inspect(dtm_cleaned)
+
+```
+
+
+
+```{r Document Term Matrix2}
+m <- as.matrix(dtm_cleaned)
+dim(m)
+colnames(m) <- dtm_cleaned$dimnames$Terms
+
+```
+
+
+
+```{r DTM 3}
+cs <- as.matrix(colSums(m))             #How many times each term appears across all documents (texts)
+rownames(cs) <- dtm_cleaned$dimnames$Terms
+
+hist(cs, breaks=100) 
 
 
 ```
 
+```{r DTM 3}
+cs <- as.matrix(colSums(m))             #How many times each term appears across all documents (texts)
+rownames(cs) <- dtm_cleaned$dimnames$Terms
+
+hist(cs, breaks=100) 
+
+
+```
 
