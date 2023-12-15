@@ -107,7 +107,19 @@ dim(m)
 
 ```{r view}
 rownames(m) <- tdm$dimnames$Terms
-colnames(m) <- c("parks, text, frequency")
+#colnames(m) <- c("parks, text, frequency") this is where we run into problems because of the comparison to the rmd 
+
+
+#colnames(m) <- c("War and Peace", "Crime and Punishment", "Pride and Prejudice", "Tale of Two Cities", "Emma", "Brothers Karamazov", "Jane Eyre", 
+#"The Great Gatsby", "Wuthering Heights", "Moby Dick", "Call of the Wild", "Frankenstein", "Little Women", "Vanity Fair", "Anna Karenina", 
+#"Count of Monte Cristo", "Great Expectations", "Les Miserables", "Dracula", "Madame Bovary", "Don Quixote", "Gullivers Travels", "Huckleberry Finn", 
+#"Picture of Dorian Gray", "White Fang", "A Christmas Carol", "The Idiot", "The Time Machine", "Age of Innocence", "Of Human Bondage", "Paradise Lost", 
+#"Robinson Crusoe", "Candide", "Last of the Mohicans", "Dead Souls", "Scarlet Letter", "Treasure Island", "Ulysses", "The Trial", "The Three Musketeers", "The #Metamorphosis", "Faust", "The Prince", "Leviathan", "David Copperfield", "Notre Dame de Paris", "Utopia")
+
+
+
+head(m)
+
 ```
 
 
@@ -145,6 +157,15 @@ tm::inspect(dtm_cleaned)
 m <- as.matrix(dtm_cleaned)
 dim(m)
 colnames(m) <- dtm_cleaned$dimnames$Terms
+# compared to the RMD by Eugene, its flipped here 
+
+# rownames(m) <- c("War and Peace", "Crime and Punishment", "Pride and Prejudice", "Tale of Two Cities", "Emma", "Brothers Karamazov", "Jane Eyre", 
+#"The Great Gatsby", "Wuthering Heights", "Moby Dick", "Call of the Wild", "Frankenstein", "Little Women", "Vanity Fair", "Anna Karenina", 
+#"Count of Monte Cristo", "Great Expectations", "Les Miserables", "Dracula", "Madame Bovary", "Don Quixote", "Gullivers Travels", "Huckleberry Finn", 
+#"Picture of Dorian Gray", "White Fang", "A Christmas Carol", "The Idiot", "The Time Machine", "Age of Innocence", "Of Human Bondage", "Paradise Lost", 
+#"Robinson Crusoe", "Candide", "Last of the Mohicans", "Dead Souls", "Scarlet Letter", "Treasure Island", "Ulysses", "The Trial", "The Three Musketeers", "The # Metamorphosis", "Faust", "The Prince", "Leviathan", "David Copperfield", "Notre Dame de Paris", "Utopia")
+
+
 
 ```
 
