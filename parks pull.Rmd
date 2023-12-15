@@ -10,7 +10,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 # libraries 
 library(tigris)
-library(yelpr)
+#library(yelpr)
 library(tidyverse)
 library(sf)
 library(mapview)
@@ -188,7 +188,7 @@ queryString <- list(
 response <- VERB("GET", url, query = queryString, add_headers('Authorization' = 'Bearer RF7JfYA8GMJRVlASJCtsrJvLMhE8nbKDjkQ8B_7ZYUPWforzJV1mNDb6ibRWJfMUu_RHFG-NxCF1QHeasyOxlpid7ZbQ1tQBcACDZBWE2rLYKDhWD8Kxps0SZJJCZXYx'), content_type("application/octet-stream"), accept("application/json"))
 
 # turn the response into a json file
-  yelp.json = content(response, "parsed", flatten = TRUE, simplify = TRUE)
+yelp.json = content(response, "parsed", flatten = TRUE, simplify = TRUE)
   
   # retrieve columns from json structure
   review.time = data.frame(yelp.json$reviews$time_created)

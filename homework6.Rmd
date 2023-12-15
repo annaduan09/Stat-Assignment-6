@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r setup, include=FALSE}
+```{r setup}
 
 
 options(scipen=999)
@@ -41,6 +41,56 @@ library(mapview)
 library(httr)
 library(viridis)
 devtools::install_github("kstagaman/autoNumCaptions")
+
+
+```
+
+```{r URL}
+
+url <- c("https://github.com/annaduan09/Stat-Assignment-6/raw/master/park_reviews.geojson")
+urltext = url$yelp.json.reviews.text
+  
+```
+
+
+```{r Corpus}
+
+
+myCorpus <- tm::VCorpus(VectorSource(sapply(url, readLines)))
+
+myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+
+```
+
+
+```{r tinkering}
+
+#     Defining the toSpace function
+toSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
+#     Defining the remApostrophe function
+remApostrophe <- content_transformer(function(x,pattern) gsub(pattern, "", x))
+#     Removing special characters
+myCorpus <- tm_map(myCorpus, toSpace, "@")
+myCorpus <- tm_map(myCorpus, toSpace, "/")
+myCorpus <- tm_map(myCorpus, toSpace, "]")
+myCorpus <- tm_map(myCorpus, toSpace, "$")
+myCorpus <- tm_map(myCorpus, toSpace, "—")
+myCorpus <- tm_map(myCorpus, toSpace, "‐")
+myCorpus <- tm_map(myCorpus, toSpace, "”")
+myCorpus <- tm_map(myCorpus, toSpace, "‘")
+myCorpus <- tm_map(myCorpus, toSpace, "“")
+myCorpus <- tm_map(myCorpus, toSpace, "‘")
+myCorpus <- tm_map(myCorpus, remApostrophe, "’")
+stopwords("english")
+myCorpus <- tm_map(myCorpus, removeWords, stopwords("english"))
+
+```
+
+
+```{r view}
+
+
+
 
 
 ```
