@@ -49,7 +49,7 @@ devtools::install_github("kstagaman/autoNumCaptions")
 
 url <- read_sf("https://github.com/annaduan09/Stat-Assignment-6/raw/master/park_reviews.geojson")
 urltext = url$yelp.json.reviews.text
-write.table(urltext, file = "yelptext.txt")
+#write.table(urltext, file = "yelptext.txt")
 
 yelptext = c("https://github.com/annaduan09/Stat-Assignment-6/raw/master/yelptext.txt")
 
@@ -107,7 +107,7 @@ dim(m)
 
 ```{r view}
 rownames(m) <- tdm$dimnames$Terms
-
+colnames(m) <- c("parks, text, frequency")
 ```
 
 
@@ -168,3 +168,35 @@ hist(cs, breaks=100)
 
 ```
 
+
+```{r sentiment analysis}
+
+nrc <- syuzhet::get_sentiment_dictionary(dictionary="nrc")
+afinn <- syuzhet::get_sentiment_dictionary(dictionary="afinn")
+bing <- syuzhet::get_sentiment_dictionary(dictionary="bing")
+syuzhet <- syuzhet::get_sentiment_dictionary(dictionary="syuzhet")
+get_nrc_sentiment("flaccid")
+
+
+```
+
+
+```{r Dataframe Creartion}
+Parks <- as.data.frame(m[1,])
+Parks$Term <- as.vector(rownames(Parks))
+colnames(Parks)[1] = "Term_Frequency"
+rownames(Parks) <- 1:nrow(Parks)
+
+nrc_sentiment <- get_nrc_sentiment(Parks$Term)
+
+Parks_Sentiment <- cbind(Parks, nrc_sentiment)
+cols_to_multiply <- names(Parks_Sentiment)[3:12]
+
+# Multiply the last ten columns (sentiments) by the first column (Term_Frequency)
+Parks_Sentiment[, cols_to_multiply] <- Parks_Sentiment[, cols_to_multiply] * Parks_Sentiment$Term_Frequency
+
+
+Parks_Sentiment_Total <- t(as.matrix(colSums(Parks_Sentiment[,-1:-2])))
+barplot(Parks_Sentiment_Total, las=2, ylab='Count', main='Sentiment Scores')
+
+```
