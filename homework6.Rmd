@@ -11,8 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r setup}
-
-
 options(scipen=999)
 
 library(wordcloud)
@@ -57,7 +55,6 @@ yelptext = c("https://github.com/annaduan09/Stat-Assignment-6/raw/master/yelptex
 
 
 ```{r Corpus}
-
 
 myCorpus <- tm::VCorpus(VectorSource(sapply(yelptext, readLines)))
 
@@ -203,10 +200,12 @@ get_nrc_sentiment("flaccid")
 
 
 ```{r Dataframe Creartion}
-Parks <- as.data.frame(m[1,])
-Parks$Term <- as.vector(rownames(Parks))
-colnames(Parks)[1] = "Term_Frequency"
-rownames(Parks) <- 1:nrow(Parks)
+Parks <- data.frame(Term = colnames(m), stringsAsFactors = FALSE)
+Parks$Term_Frequency <- colSums(m)
+#Parks <- as.data.frame(m[1,])
+#Parks$Term <- as.vector(rownames(Parks))
+#colnames(Parks)[1] = "Term_Frequency"
+#rownames(Parks) <- 1:nrow(Parks)
 
 nrc_sentiment <- get_nrc_sentiment(Parks$Term)
 
