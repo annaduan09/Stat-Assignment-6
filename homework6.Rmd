@@ -220,3 +220,37 @@ Parks_Sentiment_Total <- t(as.matrix(colSums(Parks_Sentiment[,-1:-2])))
 barplot(Parks_Sentiment_Total, las=2, ylab='Count', main='Sentiment Scores')
 
 ```
+
+
+```{r diff dictionary scores}
+#syuzhet
+Parks$Syuzhet <- as.matrix(get_sentiment(Parks$Term, method="syuzhet"))
+hist(Parks$Syuzhet)
+
+#bing
+Parks$Bing <- as.matrix(get_sentiment(Parks$Term, method="bing"))
+hist(Parks$Bing)
+
+#AFINN
+Parks$AFINN <- as.matrix(get_sentiment(Parks$Term, method="afinn"))
+hist(Parks$AFINN)
+
+#NRC
+Parks$NRC <- as.matrix(get_sentiment(Parks$Term, method="nrc"))
+hist(Parks$NRC)
+
+```
+
+**looks like we are seeing tendency towards positive sentiment using each of the four dictionaries, but still vast majority neutral terms
+
+```{r sentiment summary}
+sentiment_columns <- Parks[ , 3:6]
+sentiment_columns <- data.frame(lapply(sentiment_columns, sign))
+sentiment_columns <- data.frame(lapply(sentiment_columns, as.factor))
+
+#Raw frequencies
+sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {table(x)})
+
+#Proportions
+sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {prop.table(table(x))})
+```
