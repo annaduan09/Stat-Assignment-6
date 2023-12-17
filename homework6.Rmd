@@ -38,6 +38,7 @@ library(sf)
 library(mapview)
 library(httr)
 library(viridis)
+library(openai)
 devtools::install_github("kstagaman/autoNumCaptions")
 
 
@@ -253,4 +254,40 @@ sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {table(x)})
 
 #Proportions
 sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {prop.table(table(x))})
+```
+
+
+## ChatGPT
+
+```{r gpt setup}
+my_API <- "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"
+
+hey_chatGPT <- function(answer_my_question) {
+  chat_GPT_answer <- POST(
+    url = "https://api.openai.com/v1/chat/completions",
+    add_headers(Authorization = paste("Bearer", my_API)),
+    content_type_json(),
+    encode = "json",
+    body = list(
+      model = "gpt-3.5-turbo-0301",
+      messages = list(
+        list(
+          role = "user",
+          content = answer_my_question
+        )
+      )
+    )
+  )
+  paste(str_trim(httr::content(chat_GPT_answer)$choices[[1]]$message$content), "TOKENS USED: ", httr::content(chat_GPT_answer)$usage$total_tokens)
+}
+
+urltext.df <- as.data.frame(urltext)
+
+urltext.sample <- data.frame(urltext = urltext.df[sample(nrow(urltext.df), size=10), ])
+
+urltext.sample$summary <- NULL
+for (x in 1:nrow(urltext.sample)) {
+  urltext.sample$summary[[x]] <- paste(hey_chatGPT(paste("Please read the following reviews of parks. For each review, what was the reviewer's main point, and can you suggest a way to improve the park based on the review?", urltext.sample$urltext[[x]])))
+}
+
 ```
