@@ -169,6 +169,9 @@ colnames(m) <- dtm_cleaned$dimnames$Terms
 
 
 
+
+
+
 ```{r DTM 3}
 cs <- as.matrix(colSums(m))             #How many times each term appears across all documents (texts)
 rownames(cs) <- dtm_cleaned$dimnames$Terms
@@ -255,6 +258,25 @@ sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {table(x)})
 #Proportions
 sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {prop.table(table(x))})
 ```
+
+```{r word removing}
+#myCorpus <- tm_map(myCorpus, removeWords,c("park"))
+
+
+
+```
+
+
+```{r word cloud, warning=FALSE}
+
+# may provide different results each run, look for filler/uninformative words and use the word removing chunk for the list. 
+
+tab <- as.matrix(table(cs))
+wordcloud(myCorpus, min.freq=1000)
+
+
+```
+
 
 
 ## ChatGPT
