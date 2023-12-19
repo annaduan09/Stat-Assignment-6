@@ -260,7 +260,10 @@ sapply(sentiment_columns, function(x) if("factor" %in% class(x)) {prop.table(tab
 ## ChatGPT
 
 ```{r gpt setup}
-my_API <- "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"
+my_API <- "INSERT YOUR KEY HERE"
+
+urltext.df <- as.data.frame(urltext)
+urltext.sample <- data.frame(urltext = urltext.df[sample(nrow(urltext.df), size=6), ])
 
 hey_chatGPT <- function(answer_my_question) {
   chat_GPT_answer <- POST(
@@ -272,22 +275,22 @@ hey_chatGPT <- function(answer_my_question) {
       model = "gpt-3.5-turbo-0301",
       messages = list(
         list(
+          role = "system",
+          content = "You are a helpful assistant."
+        ),
+        list(
           role = "user",
           content = answer_my_question
         )
       )
     )
   )
-  paste(str_trim(httr::content(chat_GPT_answer)$choices[[1]]$message$content), "TOKENS USED: ", httr::content(chat_GPT_answer)$usage$total_tokens)
+  response <- httr::content(chat_GPT_answer)
+  paste(response$choices[[1]]$message$content, "TOKENS USED: ", response$usage$total_tokens)
 }
 
-urltext.df <- as.data.frame(urltext)
-
-urltext.sample <- data.frame(urltext = urltext.df[sample(nrow(urltext.df), size=10), ])
-
-urltext.sample$summary <- NULL
-for (x in 1:nrow(urltext.sample)) {
-  urltext.sample$summary[[x]] <- paste(hey_chatGPT(paste("Please read the following reviews of parks. For each review, what was the reviewer's main point, and can you suggest a way to improve the park based on the review?", urltext.sample$urltext[[x]])))
-}
+urltext.sample$summary <- sapply(urltext.sample$urltext, function(text) {
+  hey_chatGPT(paste("Please read the following reviews of parks. For each review, what was the reviewer's main point, and can you suggest a way to improve the park based on the review?", text))
+}, USE.NAMES = FALSE)
 
 ```
